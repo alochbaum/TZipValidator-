@@ -51,6 +51,7 @@
     <Compile Include="DirsForm.Designer.cs">
       <DependentUpon>DirsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Log2File.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

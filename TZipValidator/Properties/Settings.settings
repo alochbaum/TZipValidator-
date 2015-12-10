@@ -1,7 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TZipValidator.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="InDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\193102\Inbox</Value>
+    </Setting>
+    <Setting Name="Rejected" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\193102\Rejected</Value>
+    </Setting>
+    <Setting Name="Processed" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\193102\Processed</Value>
+    </Setting>
+    <Setting Name="Logging" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\193102\Logging</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>
