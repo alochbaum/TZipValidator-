@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUG
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +12,14 @@ using System.Windows.Forms;
 
 namespace TZipValidator
 {
+    class MyException : ApplicationException
+    {
+        public MyException(String Msg)
+            : base(Msg)
+        {
+        }
+    }
+
     public partial class MainForm : Form
     {
         public string strInDir, strRejected, strProcessed, strLogging;
@@ -68,7 +77,7 @@ namespace TZipValidator
         {
 
             // To copy all the TZips files in InDir directory to TEMP directory change their extension
-            string fileName, destFile, destDir;
+            string strFileName, strDestFile, strDestdir, strErr ;
             if (System.IO.Directory.Exists(strInDir))
             {
                 string[] files = System.IO.Directory.GetFiles(strInDir);
@@ -80,11 +89,31 @@ namespace TZipValidator
                     // Use static Path methods to extract only the file name from the path.
                     if (System.IO.Path.GetExtension(s).ToUpper() == ".TZIP")
                     {
-                        fileName = System.IO.Path.GetFileName(s);
-                        logString("Copying File: " + fileName);
-                        fileName = System.IO.Path.GetFileNameWithoutExtension(s);
-                        destFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), fileName + ".zip");
-                        System.IO.File.Copy(s, destFile, true);
+                        try
+                        {
+
+                            strFileName = System.IO.Path.GetFileName(s);
+                            logString("Copying File: " + strFileName);
+                            strFileName = System.IO.Path.GetFileNameWithoutExtension(s);
+                            strDestFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), strFileName + ".zip");
+                            System.IO.File.Copy(s, strDestFile, true);
+                            strDestdir = System.IO.Path.GetTempPath()+"\\TZipV\\";
+                            
+                            // if can't unzip error is thrown in a string
+                            strErr = UnZipFiles.extract2dir(strDestFile, strDestdir);
+                            if (strErr.Length > 0) throw new MyException(strErr);
+                        #if DEBUG
+                            else logString("Extracted file" + strDestFile + " to " + strDestdir);
+                        #endif
+
+
+                        }
+                        catch (System.Exception excep)
+                        {
+                            string err = "Error Processing found TZip Files: ";
+                            err += excep.Message;
+                            logString(err);
+                        }
                         // unziping file to same folder
                         //logString("Unzipping file: " + destFile);
                         //using (ZipArchive archive = ZipFile.OpenRead(zipPath))
