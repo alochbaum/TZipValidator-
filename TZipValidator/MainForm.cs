@@ -17,6 +17,7 @@ namespace TZipValidator
     {
         public string strInDir, strRejected, strProcessed, strLogging;
         Log2File myLog2File = new Log2File();
+
         //
         // loading settings and setting logging directory
         //
@@ -73,12 +74,16 @@ namespace TZipValidator
         {
             lblStatus.Text = "First Level Checking";
             // To copy all the TZips files in InDir directory to TEMP directory change their extension
-            string strFileName, strDestFile, strDestdir, strErr ;
+            string strFileName, strDestFile, strDestdir, strErr , strSortedFirstFile;
             if (System.IO.Directory.Exists(strInDir))
             {
 
                 string[] files = System.IO.Directory.GetFiles(strInDir);
                 logString("Looking for files in: " + strInDir);
+                // cleaning data out of counting object
+                CountAndCheckTGAs myCacTs = null;
+                // cleaning data out of first header object
+                ReadTargaHeader myFirstReadHeader = null;
 
                 // Copy the files and overwrite destination files if they already exist.
                 foreach (string s in files)
@@ -111,10 +116,21 @@ namespace TZipValidator
                             if(strTemp.Length > 0) { logString(strTemp); }
                             
                             // checking TZip which could lead to rejection 
-                            CountAndCheckTGAs myCacTs = new CountAndCheckTGAs();
-                            myCacTs.CountCheck(strDestdir);
-                            
+                            myCacTs = new CountAndCheckTGAs();
+                            logString(myCacTs.CountCheck(strDestdir)+"\r\n");
+                            myFirstReadHeader = new ReadTargaHeader();
 
+                            // checking first sorted name length
+                            if (myCacTs.strFirstFile.Length > 0)
+                            {
+                                // if good log optional data first (includes filename)
+                                myFirstReadHeader.HeaderString(myCacTs.strFirstFile);
+                                // then log header data which must match all other headers
+                                logString(myFirstReadHeader.strTGAOptionalData);
+                                logString(myFirstReadHeader.strTGAVitalData);
+                                if (myFirstReadHeader.blTGAisTransparent)
+                                    logString("--TGA is transparent!!");
+                            }
                         }
                         catch (System.Exception excep)
                         {

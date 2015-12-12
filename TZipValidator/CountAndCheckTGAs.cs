@@ -17,6 +17,7 @@ namespace TZipValidator
         char[] charAllNumbers = "0123456789".ToCharArray();
         public bool blError = false;
         public int iLastSequenceNum = -1, iLastNumCharInString = -1, iCountArray = 0;
+        public string strFirstFile = "";
         public string CountCheck(string strDir)
         {
             string strReturn = "";
@@ -46,6 +47,8 @@ namespace TZipValidator
                     if(iLastSequenceNum<0)
                     {
                         iLastSequenceNum = iSequencNum;
+                        // saving this for the first file header
+                        strFirstFile = name;
                     }
                     else
                     {
