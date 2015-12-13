@@ -35,14 +35,19 @@ namespace TZipValidator
                     if (!checkNumPos(shortname))
                     {
                         blError = true;
-                        return "Error in TGA naming starting with :" + name;
+                        return "Error in TGA naming starting with : " + name;
+                    }
+                    if(iLastNumCharInString<0)
+                    {
+                        blError = true;
+                        return "Couldn't find any number patter at end of TGA name: " + name;
                     }
                     int iSequencNum;
                     if(!Int32.TryParse(shortname.Substring(iLastNumCharInString - 2),
                         out iSequencNum))
                     {
                         blError = true;
-                        return "Error in TGA naming starting with :" + name;
+                        return "Error in TGA naming starting with : " + name;
                     }
                     if(iLastSequenceNum<0)
                     {

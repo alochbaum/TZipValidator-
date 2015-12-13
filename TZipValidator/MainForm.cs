@@ -160,6 +160,7 @@ namespace TZipValidator
                             {
                                 // Set cursor as hourglass
                                 Cursor.Current = Cursors.WaitCursor;
+                                lblStatus.Text = "Processing possibly many TGA files";
 
                                 logString("Above is data from first header, comparing all. This takes time!");
 
