@@ -66,20 +66,31 @@ namespace TZipValidator
             // closing the created object (form)
             myDirForm = null;
         }
+        private void btnAllHeaders_Click(object sender, EventArgs e)
+        {
+            CheckFiles("All headers");
+        }
 
+        private void btQuick_Click(object sender, EventArgs e)
+        {
+            CheckFiles("Just header");
+        }
+        
         //
         // I plan to break this up in to functions, for scanning and copying when other buttons are activated
         //
-        private void btQuick_Click(object sender, EventArgs e)
+        private void CheckFiles(string strMode)
         {
             lblStatus.Text = "First Level Checking";
             // To copy all the TZips files in InDir directory to TEMP directory change their extension
-            string strFileName, strDestFile, strDestdir, strErr , strSortedFirstFile;
+            string strFileName, strDestFile, strDestdir, strErr ;
             if (System.IO.Directory.Exists(strInDir))
             {
 
                 string[] files = System.IO.Directory.GetFiles(strInDir);
+#if DEBUG
                 logString("Looking for files in: " + strInDir);
+#endif
                 // cleaning data out of counting object
                 CountAndCheckTGAs myCacTs = null;
                 // cleaning data out of first header object
@@ -98,7 +109,9 @@ namespace TZipValidator
                         {
 
                             strFileName = System.IO.Path.GetFileName(s);
+                            // show user copied file
                             logString("Copying File: " + strFileName);
+
                             strFileName = System.IO.Path.GetFileNameWithoutExtension(s);
                             strDestFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), strFileName + ".zip");
                             System.IO.File.Copy(s, strDestFile, true);
@@ -114,10 +127,20 @@ namespace TZipValidator
                             logString( PrintModeDotText.ReturnMode(strDestdir));
                             string strTemp = PrintModeDotText.RemoveUnderScoreDirectories(strDestdir);
                             if(strTemp.Length > 0) { logString(strTemp); }
-                            
+
                             // checking TZip which could lead to rejection 
                             myCacTs = new CountAndCheckTGAs();
-                            logString(myCacTs.CountCheck(strDestdir)+"\r\n");
+                            strTemp = myCacTs.CountCheck(strDestdir);
+                            if(strTemp.Length > 0) { logString(strTemp +"\r\n"); }
+
+                            // reporting back count and first and last strings
+                            logString("---------Info on all TGA Files---------\r\n There are "
+                                + myCacTs.iCountArray.ToString() + " TGA files, starting with "
+                                + Path.GetFileName(myCacTs.strFirstFile) +
+                                " to " + Path.GetFileName(myCacTs.strLastFile) + "." 
+                             );
+
+                            // create new instance of dll class to read header, just for first file
                             myFirstReadHeader = new ReadTargaHeader();
 
                             // checking first sorted name length
@@ -131,6 +154,30 @@ namespace TZipValidator
                                 if (myFirstReadHeader.blTGAisTransparent)
                                     logString("--TGA is transparent!!");
                             }
+
+                            // if mode is check all headers we should check all headers
+                            if (strMode == "All headers")
+                            {
+                                // Set cursor as hourglass
+                                Cursor.Current = Cursors.WaitCursor;
+
+                                logString("Above is data from first header, comparing all. This takes time!");
+
+                                LooppingReadHeaders myLooping = new LooppingReadHeaders();
+                                strTemp = myLooping.TestAllHeadersWithFirst(strDestdir,
+                                    myCacTs.iCountArray, myFirstReadHeader);
+                                if(strTemp.Length > 0) { logString(strTemp ); }
+                                else
+                                {
+                                    logString("All headers in " + myCacTs.iCountArray.ToString() +
+                                        " files are good!");
+                                }
+                                // Set cursor as default arrow
+                                Cursor.Current = Cursors.Default;
+                            }
+
+                            // cleans up temp folder
+                            Directory.Delete(strDestdir, true);
                         }
                         catch (System.Exception excep)
                         {
@@ -138,18 +185,6 @@ namespace TZipValidator
                             err += excep.Message;
                             logString(err);
                         }
-                        // unziping file to same folder
-                        //logString("Unzipping file: " + destFile);
-                        //using (ZipArchive archive = ZipFile.OpenRead(zipPath))
-                        //{
-                        //    foreach (ZipArchiveEntry entry in archive.Entries)
-                        //    {
-                        //        if (entry.FullName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
-                        //        {
-                        //            entry.ExtractToFile(Path.Combine(extractPath, entry.FullName));
-                        //        }
-                        //    }
-                        //}
                     }
                 }
                 lblStatus.Text = "Waiting For Input";
@@ -164,7 +199,7 @@ namespace TZipValidator
         //
         // This sends logging string out to special Log2File class method and writes to richtext
         //
-        private void logString(string str2log)
+        protected void logString(string str2log)
         {
             str2log = DateTime.Now.TimeOfDay.ToString() + " " + str2log;
             string strOut = myLog2File.WriteLine(str2log);
@@ -174,6 +209,7 @@ namespace TZipValidator
                 richTextBox1.Text += strOut + "\r\n";
             }
             richTextBox1.Text += str2log + "\r\n";
+            Refresh();
         }
 
 
@@ -188,6 +224,7 @@ namespace TZipValidator
             TZipValidator.Properties.Settings.Default.Logging = strLogging;
             TZipValidator.Properties.Settings.Default.Save();
         }
+
 
      }
     class MyException : ApplicationException

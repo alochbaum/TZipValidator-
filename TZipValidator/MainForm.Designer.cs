@@ -33,8 +33,7 @@
             this.btnDirs = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.btQuick = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnAllHeaders = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -87,31 +86,20 @@
             this.btQuick.UseVisualStyleBackColor = true;
             this.btQuick.Click += new System.EventHandler(this.btQuick_Click);
             // 
-            // button1
+            // btnAllHeaders
             // 
-            this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(12, 66);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(250, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Checks the all above, plus headers on all TGAs.  ";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(12, 95);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(349, 23);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "Checks all the above, plus every pixel for repeated transparent frames, takes lon" +
-    "g time.";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnAllHeaders.Location = new System.Drawing.Point(12, 66);
+            this.btnAllHeaders.Name = "btnAllHeaders";
+            this.btnAllHeaders.Size = new System.Drawing.Size(327, 23);
+            this.btnAllHeaders.TabIndex = 4;
+            this.btnAllHeaders.Text = "Checks the all above, plus headers on all TGAs.  (Takes Time)";
+            this.btnAllHeaders.UseVisualStyleBackColor = true;
+            this.btnAllHeaders.Click += new System.EventHandler(this.btnAllHeaders_Click);
             // 
             // button3
             // 
             this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(12, 124);
+            this.button3.Location = new System.Drawing.Point(12, 97);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(378, 23);
             this.button3.TabIndex = 4;
@@ -121,7 +109,7 @@
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(345, 57);
+            this.lblStatus.Location = new System.Drawing.Point(18, 133);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(60, 13);
             this.lblStatus.TabIndex = 5;
@@ -134,8 +122,7 @@
             this.ClientSize = new System.Drawing.Size(494, 470);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnAllHeaders);
             this.Controls.Add(this.btQuick);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.btnDirs);
@@ -156,8 +143,7 @@
         private System.Windows.Forms.Button btnDirs;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Button btQuick;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnAllHeaders;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label lblStatus;
     }

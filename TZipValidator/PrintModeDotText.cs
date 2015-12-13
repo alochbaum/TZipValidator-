@@ -27,14 +27,14 @@ namespace TZipValidator
                 {
                     if (Path.GetFileName(name).ToLower() != "mode.txt")
                     {
-                        strReturn += "Extra Text File = " + name + "\r\n";
+                        strReturn += "Extra Text File = " + name;
                     }
                     else
                     {
                         iCountFiles++;
                         strModeFile = name;
                         if (iCountFiles > 1)
-                            strReturn += "More than one mode.txt file in TZip\r\n";
+                            strReturn += "More than one mode.txt file in TZip";
                     }
                 }
                 // check to see if we got anything
@@ -82,7 +82,7 @@ namespace TZipValidator
                 {
                     if(subdir.Name.IndexOf('_')==0)
                     {
-                        strReturn += "Found subdirectory with : " + subdir.FullName + " removing\r\n";
+                        strReturn += "Found subdirectory with : " + subdir.FullName + " removing";
                         // wiping out directory, the true at end makes it recursive all subs and files
                         // since using a recursive command need to check if directory still exists
                         if(Directory.Exists(subdir.FullName))
@@ -95,7 +95,7 @@ namespace TZipValidator
                       if(subsubdir.Name.IndexOf('_')==0)
                         {
                             strReturn += "Found subdirectory with \"" + subsubdir.FullName + 
-                                "\" programe is removing directory.\r\n";
+                                "\" program is deleting this directory.";
                             // wiping out directory, the true at end makes it recursive all subs and files
                             // since using a recursive command need to check if directory still exists
                             if (Directory.Exists(subsubdir.FullName))

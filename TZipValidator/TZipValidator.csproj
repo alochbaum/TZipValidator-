@@ -58,6 +58,9 @@
       <DependentUpon>DirsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Log2File.cs" />
+    <Compile Include="LooppingReadHeaders.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

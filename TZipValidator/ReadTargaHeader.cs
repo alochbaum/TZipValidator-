@@ -87,8 +87,11 @@ namespace TZipValidator
                     sbImageInfoOpt.Append("Signature: " + tf.Footer.Signature.ToString() + "\r\n");
                     sbImageInfoOpt.Append("ReservedCharacter: " + tf.Footer.ReservedCharacter.ToString() + "\r\n");
                 }
+                // storing the header data in accessable strings
                 strTGAOptionalData = sbImageInfoOpt.ToString();
                 strTGAVitalData = sbImageInfoVital.ToString();
+                // freeing up the TGA class for memory problems
+                tf.Dispose();
             }
             catch
             {
@@ -97,6 +100,44 @@ namespace TZipValidator
 
             return strHeader;
         }
-               
+        public bool Compare(string filename, ReadTargaHeader mFirstHeader)
+        {
+            StringBuilder sbImageInfoVital = new StringBuilder();
+            Paloma.TargaImage newtf = new Paloma.TargaImage(filename);
+            bool blreturn = true;
+            sbImageInfoVital.Append("---File Parameters which must match ---\r\n");
+            sbImageInfoVital.Append("PixelFormat: " + newtf.Image.PixelFormat.ToString() + "\r\n");
+            sbImageInfoVital.Append("Size: " + newtf.Image.Size.ToString() + "\r\n");
+            sbImageInfoVital.Append("Format: " + newtf.Format.ToString() + "\r\n");
+            sbImageInfoVital.Append("AttributeBits: " + newtf.Header.AttributeBits.ToString() + "\r\n");
+            sbImageInfoVital.Append("BytesPerPixel,PixelDepth: " + newtf.Header.BytesPerPixel.ToString() + ","
+                + newtf.Header.PixelDepth.ToString() + "\r\n");
+            sbImageInfoVital.Append("ColorMapType: " + newtf.Header.ColorMapType.ToString() + "\r\n");
+            sbImageInfoVital.Append("FirstPixelDestination: " + newtf.Header.FirstPixelDestination.ToString() + "\r\n");
+            sbImageInfoVital.Append("X,Y Origin: " + newtf.Header.XOrigin.ToString() + ","
+                 + newtf.Header.YOrigin.ToString() + "\r\n");
+            sbImageInfoVital.Append("Height,Width: " + newtf.Header.Height.ToString() + ","
+                + newtf.Header.Width.ToString() + "\r\n");
+            sbImageInfoVital.Append("Horz,VertTransferOrder: " + newtf.Header.HorizontalTransferOrder.ToString() + ","
+                + newtf.Header.VerticalTransferOrder.ToString() + "\r\n");
+            sbImageInfoVital.Append("ImageType: " + newtf.Header.ImageType.ToString() + "\r\n");
+            if (newtf.Footer.ExtensionAreaOffset > 0)
+            {
+                sbImageInfoVital.Append("GammaDenominator: " + newtf.ExtensionArea.GammaDenominator.ToString() + "\r\n");
+                sbImageInfoVital.Append("GammaNumerator: " + newtf.ExtensionArea.GammaNumerator.ToString() + "\r\n");
+                sbImageInfoVital.Append("GammaRatio: " + newtf.ExtensionArea.GammaRatio.ToString() + "\r\n");
+                sbImageInfoVital.Append("PixelAspectRatio: " + newtf.ExtensionArea.PixelAspectRatio.ToString() + "\r\n");
+                sbImageInfoVital.Append("PixelAspectRatioDenominator: " + newtf.ExtensionArea.PixelAspectRatioDenominator.ToString() + "\r\n");
+                sbImageInfoVital.Append("PixelAspectRatioNumerator: " + newtf.ExtensionArea.PixelAspectRatioNumerator.ToString() + "\r\n");
+                sbImageInfoVital.Append("PostageStampOffset: " + newtf.ExtensionArea.PostageStampOffset.ToString() + "\r\n");
+                sbImageInfoVital.Append("ScanLineOffset: " + newtf.ExtensionArea.ScanLineOffset.ToString() + "\r\n");
+            }
+            string strThisVital = sbImageInfoVital.ToString();
+            if (strThisVital != mFirstHeader.strTGAVitalData) blreturn = false;
+            // I had memory problems when I did this compare for 444 TGA files,
+            // so each time, I'm killing TGA object.
+            newtf.Dispose();
+            return blreturn;
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace TZipValidator
         char[] charAllNumbers = "0123456789".ToCharArray();
         public bool blError = false;
         public int iLastSequenceNum = -1, iLastNumCharInString = -1, iCountArray = 0;
-        public string strFirstFile = "";
+        public string strFirstFile = "", strLastFile = "";
         public string CountCheck(string strDir)
         {
             string strReturn = "";
@@ -61,6 +61,12 @@ namespace TZipValidator
                     }
 
                 }
+                //
+                // Done with looping report count of array, and last name, first name is allready out
+                //
+
+                iCountArray = array1.Count();
+                strLastFile = array1[iCountArray-1];
             }
             catch
             {
