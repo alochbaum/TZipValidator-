@@ -46,7 +46,7 @@ namespace TZipValidator
                     + tf.Header.Width.ToString() + "\r\n");
                 sbImageInfoVital.Append("Horz,VertTransferOrder: " + tf.Header.HorizontalTransferOrder.ToString() + ","
                     + tf.Header.VerticalTransferOrder.ToString() + "\r\n");
-                //sbImageInfoVital.Append("ImageDataOffset: " + tf.Header.ImageDataOffset.ToString() + "\r\n");
+                sbImageInfoVital.Append("ImageDataOffset: " + tf.Header.ImageDataOffset.ToString() + "\r\n");
                 //sbImageInfoVital.Append("ImageIDLength: " + tf.Header.ImageIDLength.ToString() + "\r\n");
                 //sbImageInfoVital.Append("ImageIDValue: " + tf.Header.ImageIDValue.ToString() + "\r\n");
                 sbImageInfoVital.Append("ImageType: " + tf.Header.ImageType.ToString() + "\r\n");
