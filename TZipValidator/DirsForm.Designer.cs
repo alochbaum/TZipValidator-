@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DirsForm));
             this.lbl1 = new System.Windows.Forms.Label();
             this.tbInDir = new System.Windows.Forms.TextBox();
             this.btnInDir = new System.Windows.Forms.Button();
@@ -194,6 +195,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tbInDir);
             this.Controls.Add(this.lbl1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DirsForm";
             this.Text = "Set the program\'s directory settings";
             this.Shown += new System.EventHandler(this.DirsForm_Shown);

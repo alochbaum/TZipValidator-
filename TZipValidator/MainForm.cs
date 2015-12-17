@@ -17,6 +17,8 @@ namespace TZipValidator
     {
         public string strInDir, strRejected, strProcessed, strLogging;
         Log2File myLog2File = new Log2File();
+        // To keep a single instance of this creating it, here and nulling before needed
+        Fixing myFixing = new Fixing();
 
         //
         // loading settings and setting logging directory
@@ -71,6 +73,10 @@ namespace TZipValidator
             CheckFiles("All headers");
         }
 
+        private void btnFix_Click(object sender, EventArgs e)
+        {
+            CheckFiles("Fix All");
+        }
         private void btQuick_Click(object sender, EventArgs e)
         {
             CheckFiles("Just header");
@@ -176,9 +182,21 @@ namespace TZipValidator
                                 // Set cursor as default arrow
                                 Cursor.Current = Cursors.Default;
                             }
+                            // if mode is fix then we had better fix
+                            if (strMode == "Fix All")
+                            {
+                                myFixing = null;
+                                myFixing = new Fixing();
+                                // setting the data
+                                myFixing.strFullFileName = myCacTs.strFirstFile;
+                                myFixing.iCharNumStarts = myCacTs.iFirstNumCharInString;
+                                myFixing.iNumberOfFiles = myCacTs.iCountArray;
+                                myFixing.Show();
+
+                            }
 
                             // cleans up temp folder
-                            Directory.Delete(strDestdir, true);
+                            // Directory.Delete(strDestdir, true);
                         }
                         catch (System.Exception excep)
                         {
@@ -225,6 +243,8 @@ namespace TZipValidator
             TZipValidator.Properties.Settings.Default.Logging = strLogging;
             TZipValidator.Properties.Settings.Default.Save();
         }
+
+
 
 
      }

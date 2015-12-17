@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.lbl1 = new System.Windows.Forms.Label();
             this.lblInDir = new System.Windows.Forms.Label();
             this.btnDirs = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.btQuick = new System.Windows.Forms.Button();
             this.btnAllHeaders = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnFix = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -96,15 +97,15 @@
             this.btnAllHeaders.UseVisualStyleBackColor = true;
             this.btnAllHeaders.Click += new System.EventHandler(this.btnAllHeaders_Click);
             // 
-            // button3
+            // btnFix
             // 
-            this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(12, 97);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(378, 23);
-            this.button3.TabIndex = 4;
-            this.button3.Text = "Monitor Input Directory, scan TZip files fix or reject and move out of directory";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnFix.Location = new System.Drawing.Point(12, 97);
+            this.btnFix.Name = "btnFix";
+            this.btnFix.Size = new System.Drawing.Size(378, 23);
+            this.btnFix.TabIndex = 4;
+            this.btnFix.Text = "Monitor Input Directory, scan TZip files fix or reject and move out of directory";
+            this.btnFix.UseVisualStyleBackColor = true;
+            this.btnFix.Click += new System.EventHandler(this.btnFix_Click);
             // 
             // lblStatus
             // 
@@ -121,13 +122,14 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(494, 470);
             this.Controls.Add(this.lblStatus);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.btnFix);
             this.Controls.Add(this.btnAllHeaders);
             this.Controls.Add(this.btQuick);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.btnDirs);
             this.Controls.Add(this.lblInDir);
             this.Controls.Add(this.lbl1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "TZipValidator";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -144,7 +146,7 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Button btQuick;
         private System.Windows.Forms.Button btnAllHeaders;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnFix;
         private System.Windows.Forms.Label lblStatus;
     }
 }

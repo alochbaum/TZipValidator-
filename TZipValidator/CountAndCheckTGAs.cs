@@ -16,7 +16,7 @@ namespace TZipValidator
         // save a little time creating number array for testing
         char[] charAllNumbers = "0123456789".ToCharArray();
         public bool blError = false;
-        public int iLastSequenceNum = -1, iLastNumCharInString = -1, iCountArray = 0;
+        public int iLastSequenceNum = -1, iLastNumCharInString = -1, iCountArray = 0, iFirstNumCharInString = -1;
         public string strFirstFile = "", strLastFile = "";
         public string CountCheck(string strDir)
         {
@@ -43,7 +43,7 @@ namespace TZipValidator
                         return "Couldn't find any number patter at end of TGA name: " + name;
                     }
                     int iSequencNum;
-                    if(!Int32.TryParse(shortname.Substring(iLastNumCharInString - 2),
+                    if(!Int32.TryParse(shortname.Substring(iFirstNumCharInString),
                         out iSequencNum))
                     {
                         blError = true;
@@ -82,16 +82,28 @@ namespace TZipValidator
         }
         //
         // Searches backward for first number, prevents my1.tga and my10.tga number problem
+        // Also sets marker on first char num digit to determine number of zeros later
         //
         private bool checkNumPos(string strIn)
         {
             int i = strIn.LastIndexOfAny(charAllNumbers);
+            // this is first run through set the base line
             if (iLastNumCharInString < 0)
             {
+                // first run through setting the base number
                 iLastNumCharInString = i;
+                // now determine the start of the number sequence to determine number of zeros, doing this once
+                for(int ii = i;i>0;ii--)
+                {
+                    int iTemp =strIn[ii].ToString().IndexOfAny(charAllNumbers);
+                    if (iTemp != 0)break;
+                    iFirstNumCharInString = ii;
+
+                }
             }
             else
             {
+                // checking is string had added digit like my1.tga growing to my10.tga
                 if (i != iLastNumCharInString)
                 {
                     return false;
