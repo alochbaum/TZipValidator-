@@ -32,6 +32,8 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.lblListFiles = new System.Windows.Forms.Label();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -62,11 +64,31 @@
             this.lblStatus.TabIndex = 1;
             this.lblStatus.Text = "label1";
             // 
+            // lblListFiles
+            // 
+            this.lblListFiles.AutoSize = true;
+            this.lblListFiles.Location = new System.Drawing.Point(13, 33);
+            this.lblListFiles.Name = "lblListFiles";
+            this.lblListFiles.Size = new System.Drawing.Size(41, 13);
+            this.lblListFiles.TabIndex = 2;
+            this.lblListFiles.Text = "starting";
+            this.lblListFiles.Visible = false;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(12, 54);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(795, 23);
+            this.progressBar1.TabIndex = 3;
+            this.progressBar1.Visible = false;
+            // 
             // Fixing
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(819, 550);
+            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.lblListFiles);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.panel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -85,5 +107,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Label lblListFiles;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
