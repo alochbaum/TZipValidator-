@@ -191,12 +191,14 @@ namespace TZipValidator
                                 myFixing.strFullFileName = myCacTs.strFirstFile;
                                 myFixing.iCharNumStarts = myCacTs.iFirstNumCharInString;
                                 myFixing.iNumberOfFiles = myCacTs.iCountArray;
+                                myFixing.m_parent = this;
                                 myFixing.Show();
 
                             }
 
-                            // cleans up temp folder
-                            // Directory.Delete(strDestdir, true);
+                            // cleans up temp folder unless fixing is calling post fixing functions
+                            if (strMode != "Fix All") 
+                                Directory.Delete(strDestdir, true);
                         }
                         catch (System.Exception excep)
                         {
@@ -206,7 +208,9 @@ namespace TZipValidator
                         }
                     }
                 }
-                lblStatus.Text = "Waiting For Input";
+                if (strMode != "Fix All") 
+                    lblStatus.Text = "Waiting For Input";
+                else lblStatus.Text = "Fixing";
             }
             else
             {
@@ -217,8 +221,9 @@ namespace TZipValidator
 
         //
         // This sends logging string out to special Log2File class method and writes to richtext
+        // Also used by fixing class
         //
-        protected void logString(string str2log)
+        public void logString(string str2log)
         {
             str2log = DateTime.Now.TimeOfDay.ToString() + " " + str2log;
             string strOut = myLog2File.WriteLine(str2log);
@@ -230,7 +235,30 @@ namespace TZipValidator
             richTextBox1.Text += str2log + "\r\n";
             Refresh();
         }
-
+        //
+        // Fixing Form had error report and shut down
+        //
+        public void postFixingBad(string strError)
+        {
+            logString(strError);
+            // Set cursor as default arrow
+            Cursor.Current = Cursors.Default;
+            myFixing.Hide();
+            myFixing.Dispose();
+            myFixing = null;
+        }
+        //
+        // Fixing Form came backgood
+        //
+        public void postFixingGood(string strError)
+        {
+            logString(strError);
+            // Set cursor as default arrow
+            Cursor.Current = Cursors.Default;
+            myFixing.Hide();
+            myFixing.Dispose();
+            myFixing = null;
+        }
 
         //
         // Saving settings on shutdown

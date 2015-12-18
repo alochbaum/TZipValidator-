@@ -18,6 +18,7 @@ namespace TZipValidator
         public string strFullFileName;
         public int iCharNumStarts;
         public int iNumberOfFiles;
+        public MainForm m_parent;
         private int iSizeNumField;
         public string strMiddleName,strFixMode="";
         //private int iRows, iColumns, iOffset;
@@ -78,6 +79,7 @@ namespace TZipValidator
 
                     try
                     {
+
                         using (BinaryReader binReader = new BinaryReader(File.Open(strMiddleName, FileMode.Open)))
                         {
                             // seek to the beginning of the image data using the ImageDataOffset value
@@ -203,7 +205,7 @@ namespace TZipValidator
             progressBar1.Maximum = iNumberOfFiles;
             // Set cursor as hourglass
             Cursor.Current = Cursors.WaitCursor;
-            
+            #region Start Fixing if Fix Mode is Greater Than Zero
             if (strFixMode.Length > 0)
             {
                 int iXchange, iYchange;
@@ -244,46 +246,135 @@ namespace TZipValidator
                             strMiddleName = Path.GetDirectoryName(strFullFileName) + @"\" +
                                 strShortName.Substring(0, iCharNumStarts) + strTemp + iMiddleFrame.ToString() + ".tga";
                         }
-                        lblListFiles.Text = "Doing number: " + i.ToString() + " File Name: " + strMiddleName;
+                        lblListFiles.Text = "Fixing number: " + i.ToString() + " File Name: " + strMiddleName;
+                        m_parent.logString(lblListFiles.Text);
                         progressBar1.Value = i;
                         Refresh();
-                        using (BinaryReader binReader = new BinaryReader(File.Open(strMiddleName, FileMode.Open)))
+                        #region Fixing Uncompressed
+                        if (tf.Header.ImageType.ToString() == "UNCOMPRESSED_TRUE_COLOR")
                         {
-                            //
-                            byte[] chunk = new byte[4096];
-                            byte[] bPixel = new byte[4];
-                            // going to write file to %TEMP%\TZipV\Out\ folder
-                            using (BinaryWriter binWriter = new BinaryWriter(File.Open(
-                                System.IO.Path.GetTempPath()+@"TZipV\Out\" +
-                                Path.GetFileName(strMiddleName), FileMode.Create)))
+                            using (BinaryReader binReader = new BinaryReader(File.Open(strMiddleName, FileMode.Open)))
                             {
-                                // write file header
-                                chunk = binReader.ReadBytes(tf.Header.ImageDataOffset);
-                                binWriter.Write(chunk,0,tf.Header.ImageDataOffset);
-                                // loop through each row in the image
-                                for (int j = 0; j < tf.Header.Height; i++)
+                                // Reading buffers
+                                byte[] chunk = new byte[4096];
+                                byte[] bPixel = new byte[4];
+                                // going to write file to %TEMP%\TZipV\Out\ folder
+                                using (BinaryWriter binWriter = new BinaryWriter(File.Open(
+                                    System.IO.Path.GetTempPath() + @"TZipV\Out\" +
+                                    Path.GetFileName(strMiddleName), FileMode.Create)))
                                 {
-                                    // loop through each byte in the row
-                                    for (int k = 0; k < tf.Header.Width; j += 4)
+                                    // write file header
+                                    chunk = binReader.ReadBytes(tf.Header.ImageDataOffset);
+                                    binWriter.Write(chunk, 0, tf.Header.ImageDataOffset);
+                                    // loop through each row in the image
+                                    for (int j = 0; j < tf.Header.Height; i++)
                                     {
-                                        // reading one pixel
-                                        bPixel = binReader.ReadBytes(4);
-                                        // checking if it the change pixel
-                                        if((k==iYchange)&&(j==iXchange))
+                                        // loop through each byte in the row
+                                        for (int k = 0; k < tf.Header.Width; j += 4)
                                         {
-                                            bPixel[0] = (byte)((i % 4) * 25);
+                                            // reading one pixel
+                                            bPixel = binReader.ReadBytes(4);
+                                            // checking if it the change pixel
+                                            if ((k == iYchange) && (j == iXchange))
+                                            {
+                                                // changing byte every file, to amount higher than 22 to test
+                                                bPixel[0] = (byte)(((i % 4) * 25)+22);
+                                            }
+                                            binWriter.Write(bPixel, 0, 4);
                                         }
-                                        binWriter.Write(bPixel, 0, 4);
                                     }
-                                }
-                                // write out rest of file
-                                while (binReader.PeekChar() != -1)
-                                {
-                                    binWriter.Write(binReader.ReadChar());
+                                    // write out rest of file
+                                    while (binReader.PeekChar() != -1)
+                                    {
+                                        binWriter.Write(binReader.ReadChar());
+                                    }
                                 }
                             }
                         }
+#endregion
+                        #region Fixing Compress
+                        else if (tf.Header.ImageType.ToString() == "RUN_LENGTH_ENCODED_TRUE_COLOR")
+                        {
+                            using (BinaryReader binReader = new BinaryReader(File.Open(strMiddleName, FileMode.Open)))
+                            {
+                                //
+                                byte[] chunk = new byte[4096];
+                                byte[] bPixel = new byte[4];
+                                byte bRLEPacket;
+                                int intImageBytesRead = 0, intRLEPacketType, intRLEPixelCount;
+
+                                // get the size in bytes of each row in the image, RLE doesn't count
+                                int intImageRowByteSize = 4 * tf.Header.Width;
+
+                                // get the size in bytes of the whole image
+                                int intImageByteSize = intImageRowByteSize * tf.Header.Height;
+
+                                // compute the change byte (right now it is end of the rows for simple compression change)
+                                int iChangeByte = (iYchange * 7680) + 7676;
+                                using (BinaryWriter binWriter = new BinaryWriter(File.Open(
+                                    System.IO.Path.GetTempPath() + @"TZipV\Out\" +
+                                    Path.GetFileName(strMiddleName), FileMode.Create)))
+                                {
+                                    // write file header
+                                    chunk = binReader.ReadBytes(tf.Header.ImageDataOffset);
+                                    binWriter.Write(chunk, 0, tf.Header.ImageDataOffset);
+                                    // keep reading until we have the all image bytes
+                                    while (intImageBytesRead < intImageByteSize)
+                                    {
+                                        // get the RLE packet
+                                        bRLEPacket = binReader.ReadByte();
+                                        // if the high bit is 1 then repeat next pixel total of low bits + 1
+                                        // if the high bit is 0 then next are number of non-repeating pixels +1
+                                        // logical or broken in this section
+                                        intRLEPacketType = (int)(bRLEPacket & 128);
+                                        intRLEPixelCount = (int)(bRLEPacket & 127) + 1;
+
+                                        // if the high bit is 1 then repeat
+                                        if (intRLEPacketType == 128)
+                                        {
+                                            bPixel = binReader.ReadBytes(4);
+                                            intImageBytesRead += intRLEPixelCount * 4;
+                                            //counting on compressing by row  just changing row before fixing
+                                            if (iChangeByte < intImageBytesRead)
+                                            {
+                                                bRLEPacket--;
+                                                binWriter.Write(bRLEPacket);
+                                                binWriter.Write(bPixel, 0, 4);
+                                                // value for 1 unique pixel
+                                                bRLEPacket = 0;
+                                                bPixel[0] = (byte)(((i % 4) * 25) + 22);
+                                                binWriter.Write(bRLEPacket);
+                                                binWriter.Write(bPixel, 0, 4);
+                                            }
+                                        }
+                                        else // these are individual bytes
+                                        {
+                                            // get the number of bytes to read based on the read pixel count
+                                            int intBytesToRead = intRLEPixelCount * 4;
+                                            // read each byte
+                                            for (int ii = 0; ii < intBytesToRead; ii++)
+                                            {
+                                                bPixel = binReader.ReadBytes(4);
+                                                if (iChangeByte == intImageBytesRead)
+                                                    // changing byte every file, to amount higher than 22 to test
+                                                    bPixel[0] = (byte)(((i % 4) * 25)+22);
+                                                intImageBytesRead += 4;
+                                                binWriter.Write(bRLEPacket);
+                                                binWriter.Write(bPixel, 0, 4);
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                        #endregion
+                        else
+                        {
+                            // Throw error modified file not correct
+                        }
                     }
+
                 }
                 catch
                 {
@@ -291,8 +382,12 @@ namespace TZipValidator
                 }
 
             }
+            #endregion  // fixing is mode is length is there
+
+
             // Set cursor as default arrow
             Cursor.Current = Cursors.Default;
+            m_parent.postFixingGood("Fixing Made it to End");
 
 
         }
