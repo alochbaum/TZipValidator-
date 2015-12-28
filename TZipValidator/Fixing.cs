@@ -232,9 +232,23 @@ namespace TZipValidator
                 }
                 try
                 {
+                    // Clean up out directory, if exists delete and rebuild
+                    if (Directory.Exists( System.IO.Path.GetTempPath() + @"TZipV\Out\"))
+                    {
+                        Directory.Delete(System.IO.Path.GetTempPath() + @"TZipV\Out\", true);
+                    }
+                    // remake out directory
+                    Directory.CreateDirectory(System.IO.Path.GetTempPath() + @"TZipV\Out\");
+                    // if exists copy mode.txt file to the folder
+                    if (File.Exists(Path.GetDirectoryName(strFullFileName) + @"\Mode.text"))
+                    {
+                        File.Copy(Path.GetDirectoryName(strFullFileName) + @"\Mode.text",
+                            System.IO.Path.GetTempPath() + @"TZipV\Out\");
+                    }
+
                     for (int i = 0; i < iNumberOfFiles; i++)
                     {
-                        int iNumOfZeros2Add = iSizeNumField - iMiddleFrame.ToString().Length;
+                        int iNumOfZeros2Add = iSizeNumField - i.ToString().Length;
                         if (iNumOfZeros2Add < 1)
                         {
                             strMiddleName = Path.GetDirectoryName(strFullFileName) + @"\" +
@@ -244,7 +258,7 @@ namespace TZipValidator
                         {
                             string strTemp = new String('0', iNumOfZeros2Add);
                             strMiddleName = Path.GetDirectoryName(strFullFileName) + @"\" +
-                                strShortName.Substring(0, iCharNumStarts) + strTemp + iMiddleFrame.ToString() + ".tga";
+                                strShortName.Substring(0, iCharNumStarts) + strTemp + i.ToString() + ".tga";
                         }
                         lblListFiles.Text = "Fixing number: " + i.ToString() + " File Name: " + strMiddleName;
                         m_parent.logString(lblListFiles.Text);
@@ -346,13 +360,19 @@ namespace TZipValidator
                                                 binWriter.Write(bRLEPacket);
                                                 binWriter.Write(bPixel, 0, 4);
                                             }
+                                            // Just sending compression through to output file is this isn't a change section
+                                            else
+                                            {
+                                                binWriter.Write(bRLEPacket);
+                                                binWriter.Write(bPixel, 0, 4);
+                                            }
+
                                         }
                                         else // these are individual bytes
                                         {
-                                            // get the number of bytes to read based on the read pixel count
-                                            int intBytesToRead = intRLEPixelCount * 4;
+
                                             // read each byte
-                                            for (int ii = 0; ii < intBytesToRead; ii++)
+                                            for (int ii = 0; ii < intRLEPixelCount; ii++)
                                             {
                                                 bPixel = binReader.ReadBytes(4);
                                                 if (iChangeByte == intImageBytesRead)

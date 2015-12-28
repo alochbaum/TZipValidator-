@@ -11,6 +11,31 @@ namespace TZipValidator
     public static class UnZipFiles
     {
         //
+        // using .Net System.IO.Compression.FileSystem reference compress the files
+        //
+        public static string compressNmove(string strDir, string strFile)
+        {
+            try
+            {
+                // check to see if directory exists, if found wipe out files
+                if (Directory.Exists(strDir))
+                {
+                    ZipFile.CreateFromDirectory(strDir, strFile);
+                    // remove directory after move
+                    Directory.Delete(strDir,true);
+                }
+                else { return "ERROR: Program tried to zip a directory "+strDir+ " which doesn't exists."; }
+                return "";
+            }
+            catch (System.Exception excep)
+            {
+                string err = "Error compressing " + strFile + ": ";
+                err += excep.Message;
+                return err;
+            }
+
+        }
+        //
         // using .Net System.IO.Compression.FileSystem reference the program extracts files
         //
         public static string extract2dir(string strFile, string strDir)

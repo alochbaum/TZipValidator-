@@ -32,8 +32,10 @@ namespace TZipValidator
             strLogging = TZipValidator.Properties.Settings.Default.Logging;
             myLog2File.SetDirectory(strLogging);
             lblStatus.Text = "Waiting For Input";
-            myLog2File.WriteLine(DateTime.Now.TimeOfDay.ToString() + 
+            myLog2File.WriteLine(DateTime.Now.TimeOfDay.ToString() +
                 "---TZipValidator starting up\r\n");
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            this.Text = String.Format("TZipValidator Version {0}", version);
         }
 
         //
@@ -64,7 +66,7 @@ namespace TZipValidator
                     strLogging = myDirForm.strSLogging;
                 }
             }
-           
+
             // closing the created object (form)
             myDirForm = null;
         }
@@ -81,7 +83,7 @@ namespace TZipValidator
         {
             CheckFiles("Just header");
         }
-        
+
         //
         // I plan to break this up in to functions, for scanning and copying when other buttons are activated
         //
@@ -89,10 +91,13 @@ namespace TZipValidator
         {
             lblStatus.Text = "First Level Checking";
             // To copy all the TZips files in InDir directory to TEMP directory change their extension
-            string strFileName, strDestFile, strDestdir, strErr ;
+            string strFileName, strDestFile, strDestdir, strErr;
             if (System.IO.Directory.Exists(strInDir))
             {
-
+                #region counting and checking files
+                //
+                // here is the scanning of the input folder for .TZip files, then copy the .TZip to Temp, unzip and explore folder
+                //
                 string[] files = System.IO.Directory.GetFiles(strInDir);
 #if DEBUG
                 logString("Looking for files in: " + strInDir);
@@ -106,7 +111,7 @@ namespace TZipValidator
                 foreach (string s in files)
                 {
 #if DEBUG
-                    logString("Working File: "+s.ToString());
+                    logString("Working File: " + s.ToString());
 #endif
                     // Use static Path methods to extract only the file name from the path.
                     if (System.IO.Path.GetExtension(s).ToUpper() == ".TZIP")
@@ -121,8 +126,8 @@ namespace TZipValidator
                             strFileName = System.IO.Path.GetFileNameWithoutExtension(s);
                             strDestFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), strFileName + ".zip");
                             System.IO.File.Copy(s, strDestFile, true);
-                            strDestdir = System.IO.Path.GetTempPath()+@"TZipV\";
-                            
+                            strDestdir = System.IO.Path.GetTempPath() + @"TZipV\";
+
                             // if can't unzip error is thrown in a string
                             strErr = UnZipFiles.extract2dir(strDestFile, strDestdir);
                             if (strErr.Length > 0) throw new MyException(strErr);
@@ -130,20 +135,20 @@ namespace TZipValidator
                             else logString("Extracted file" + strDestFile + " to " + strDestdir);
 #endif
                             // check TZip for mode.txt (optional)
-                            logString( PrintModeDotText.ReturnMode(strDestdir));
+                            logString(PrintModeDotText.ReturnMode(strDestdir));
                             string strTemp = PrintModeDotText.RemoveUnderScoreDirectories(strDestdir);
-                            if(strTemp.Length > 0) { logString(strTemp); }
+                            if (strTemp.Length > 0) { logString(strTemp); }
 
                             // checking TZip which could lead to rejection 
                             myCacTs = new CountAndCheckTGAs();
                             strTemp = myCacTs.CountCheck(strDestdir);
-                            if(strTemp.Length > 0) { logString(strTemp +"\r\n"); }
+                            if (strTemp.Length > 0) { logString(strTemp + "\r\n"); }
 
                             // reporting back count and first and last strings
                             logString("---------Info on all TGA Files---------\r\n There are "
                                 + myCacTs.iCountArray.ToString() + " TGA files, starting with "
                                 + Path.GetFileName(myCacTs.strFirstFile) +
-                                " to " + Path.GetFileName(myCacTs.strLastFile) + "." 
+                                " to " + Path.GetFileName(myCacTs.strLastFile) + "."
                              );
 
                             // create new instance of dll class to read header, just for first file
@@ -160,7 +165,8 @@ namespace TZipValidator
                                 if (myFirstReadHeader.blTGAisTransparent)
                                     logString("--TGA is transparent!!");
                             }
-
+                #endregion
+                            #region All headers check
                             // if mode is check all headers we should check all headers
                             if (strMode == "All headers")
                             {
@@ -173,7 +179,7 @@ namespace TZipValidator
                                 LooppingReadHeaders myLooping = new LooppingReadHeaders();
                                 strTemp = myLooping.TestAllHeadersWithFirst(strDestdir,
                                     myCacTs.iCountArray, myFirstReadHeader);
-                                if(strTemp.Length > 0) { logString(strTemp ); }
+                                if (strTemp.Length > 0) { logString(strTemp); }
                                 else
                                 {
                                     logString("All headers in " + myCacTs.iCountArray.ToString() +
@@ -182,6 +188,8 @@ namespace TZipValidator
                                 // Set cursor as default arrow
                                 Cursor.Current = Cursors.Default;
                             }
+                            #endregion
+                            #region Fix All
                             // if mode is fix then we had better fix
                             if (strMode == "Fix All")
                             {
@@ -194,11 +202,13 @@ namespace TZipValidator
                                 myFixing.m_parent = this;
                                 myFixing.Show();
 
+                            
                             }
-
+                            #endregion
                             // cleans up temp folder unless fixing is calling post fixing functions
-                            if (strMode != "Fix All") 
+                            if (strMode != "Fix All")
                                 Directory.Delete(strDestdir, true);
+
                         }
                         catch (System.Exception excep)
                         {
@@ -207,10 +217,10 @@ namespace TZipValidator
                             logString(err);
                         }
                     }
+                   
+                    lblStatus.Text = "Looping through found Files";
                 }
-                if (strMode != "Fix All") 
-                    lblStatus.Text = "Waiting For Input";
-                else lblStatus.Text = "Fixing";
+
             }
             else
             {
@@ -219,6 +229,7 @@ namespace TZipValidator
             }
         }
 
+        #region logString
         //
         // This sends logging string out to special Log2File class method and writes to richtext
         // Also used by fixing class
@@ -235,6 +246,8 @@ namespace TZipValidator
             richTextBox1.Text += str2log + "\r\n";
             Refresh();
         }
+        #endregion
+        #region postFixingBad
         //
         // Fixing Form had error report and shut down
         //
@@ -247,6 +260,8 @@ namespace TZipValidator
             myFixing.Dispose();
             myFixing = null;
         }
+        #endregion
+        #region postFixingGood
         //
         // Fixing Form came backgood
         //
@@ -258,8 +273,17 @@ namespace TZipValidator
             myFixing.Hide();
             myFixing.Dispose();
             myFixing = null;
+            // Folder needs compressing at System.IO.Path.GetTempPath() + @"TZipV\Out\"
+            // if can't unzip error is thrown in a string
+            string strErr = UnZipFiles.compressNmove(System.IO.Path.GetTempPath() + @"TZipV\Out\", System.IO.Path.GetTempPath() + @"TZipV\Out.tZip");
+            if (strErr.Length > 0) logString(strErr);
+#if DEBUG
+            else logString(@" I created %Temp%\TZipV\Out.tZip");
+#endif
+            
         }
-
+        #endregion
+        #region Saving Settings as FormClosing
         //
         // Saving settings on shutdown
         //
@@ -271,11 +295,8 @@ namespace TZipValidator
             TZipValidator.Properties.Settings.Default.Logging = strLogging;
             TZipValidator.Properties.Settings.Default.Save();
         }
-
-
-
-
-     }
+        #endregion
+    }
     class MyException : ApplicationException
     {
         public MyException(String Msg)
