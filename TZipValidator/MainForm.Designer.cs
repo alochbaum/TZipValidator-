@@ -81,7 +81,7 @@
             // 
             this.btQuick.Location = new System.Drawing.Point(12, 37);
             this.btQuick.Name = "btQuick";
-            this.btQuick.Size = new System.Drawing.Size(307, 23);
+            this.btQuick.Size = new System.Drawing.Size(315, 23);
             this.btQuick.TabIndex = 4;
             this.btQuick.Text = "Check mode.txt,TGA names, size + transparency of first TGA.";
             this.btQuick.UseVisualStyleBackColor = true;
@@ -91,7 +91,7 @@
             // 
             this.btnAllHeaders.Location = new System.Drawing.Point(12, 66);
             this.btnAllHeaders.Name = "btnAllHeaders";
-            this.btnAllHeaders.Size = new System.Drawing.Size(327, 23);
+            this.btnAllHeaders.Size = new System.Drawing.Size(326, 23);
             this.btnAllHeaders.TabIndex = 4;
             this.btnAllHeaders.Text = "Checks the all above, plus headers on all TGAs.  (Takes Time)";
             this.btnAllHeaders.UseVisualStyleBackColor = true;
@@ -101,9 +101,9 @@
             // 
             this.btnFix.Location = new System.Drawing.Point(12, 97);
             this.btnFix.Name = "btnFix";
-            this.btnFix.Size = new System.Drawing.Size(378, 23);
+            this.btnFix.Size = new System.Drawing.Size(387, 23);
             this.btnFix.TabIndex = 4;
-            this.btnFix.Text = "Monitor Input Directory, scan TZip files fix or reject and move out of directory";
+            this.btnFix.Text = "Scan Input Directory, scan TZip files fix or reject and move out of directory";
             this.btnFix.UseVisualStyleBackColor = true;
             this.btnFix.Click += new System.EventHandler(this.btnFix_Click);
             // 

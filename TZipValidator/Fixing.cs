@@ -20,7 +20,7 @@ namespace TZipValidator
         public int iNumberOfFiles;
         public MainForm m_parent;
         private int iSizeNumField;
-        public string strMiddleName,strFixMode="";
+        public string strMiddleName,strFixMode="",strError="";
         //private int iRows, iColumns, iOffset;
         public Fixing()
         {
@@ -135,7 +135,11 @@ namespace TZipValidator
                         }
 
                     }
-                    catch { throw; }
+                    catch (Exception ex)
+                    {
+                        strError = "Error in scanning pixels in compressed mode section: " + ex.Message;
+                        DialogResult = DialogResult.Cancel;
+                    }
                 } // end if for compressed mode
                 #endregion
                 #region NON-COMPRESSED
@@ -168,13 +172,19 @@ namespace TZipValidator
                         }
 
                     }
-                    catch { throw; }
+                    catch (Exception ex)
+                    {
+                        strError = "Error in scanning pixels in uncompressed mode section: " + ex.Message;
+                        DialogResult = DialogResult.Cancel;
+
+                      }
                 }
                 #endregion
                 #region neither Compress or Non-Compressed
                 else
                 {
-                    // throw back checked for 2 images types and it was neither
+                    strError = "Error: graphics are of an unsupported format";
+                    DialogResult = DialogResult.Cancel;
                 }
                 #endregion
                 #region Report Fixing Mode
@@ -194,7 +204,8 @@ namespace TZipValidator
             #region not Format32bppRgb
             else
             {
-                //throw back not Format32bppRgb
+                strError = "Error: graphics are not Format32bppRgb or don't have alpha channel";
+                DialogResult = DialogResult.Cancel;
             }
             #endregion
             // clearing out old graphic
@@ -260,7 +271,9 @@ namespace TZipValidator
                             strMiddleName = Path.GetDirectoryName(strFullFileName) + @"\" +
                                 strShortName.Substring(0, iCharNumStarts) + strTemp + i.ToString() + ".tga";
                         }
+#if NumDebug
                         lblListFiles.Text = "Fixing number: " + i.ToString() + " File Name: " + strMiddleName;
+#endif
                         m_parent.logString(lblListFiles.Text);
                         progressBar1.Value = i;
                         Refresh();
@@ -396,20 +409,28 @@ namespace TZipValidator
                     }
 
                 }
-                catch
+                catch (Exception ex)
                 {
-                    throw;
+                    strError="Error in correcting section: " + ex.Message;
+                    DialogResult = DialogResult.Cancel;
                 }
 
             }
-            #endregion  // fixing is mode is length is there
+            #endregion  // fixing mode
 
+            // Returning good after copying mode file
+            string strTestMode = Path.GetDirectoryName(strFullFileName) + @"\mode.txt";
+            if (File.Exists(strTestMode))
+            {
+                File.Move(Path.GetDirectoryName(strFullFileName) + "mode.txt", System.IO.Path.GetTempPath() + @"TZipV\Out\");
+            }
+            DialogResult = DialogResult.OK;
+        }
 
-            // Set cursor as default arrow
-            Cursor.Current = Cursors.Default;
-            m_parent.postFixingGood("Fixing Made it to End");
-
-
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            strError = "Error: user cancelled fixing operation with cancel button.";
+            DialogResult = DialogResult.Cancel;
         }
     }
 }

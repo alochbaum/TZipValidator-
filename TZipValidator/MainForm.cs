@@ -200,8 +200,28 @@ namespace TZipValidator
                                 myFixing.iCharNumStarts = myCacTs.iFirstNumCharInString;
                                 myFixing.iNumberOfFiles = myCacTs.iCountArray;
                                 myFixing.m_parent = this;
-                                myFixing.Show();
-
+                                // Show testDialog as a modal dialog and determine if DialogResult = OK.
+                                if (myFixing.ShowDialog(this) == DialogResult.OK)
+                                {
+                                    // Folder needs compressing at System.IO.Path.GetTempPath() + @"TZipV\Out\"
+                                    // if can't unzip error is thrown in a string
+                                    string strCompressErr = UnZipFiles.compressNmove(System.IO.Path.GetTempPath() + @"TZipV\Out\", System.IO.Path.GetTempPath() + @"TZipV\Out.tZip");
+                                    if (strCompressErr.Length > 0) logString(strCompressErr);
+#if DEBUG
+                                    else logString(@" I created %Temp%\TZipV\Out.tZip");
+#endif
+                                    // moving the good file to processed directory and deleting original
+                                    File.Move(System.IO.Path.GetTempPath() + @"TZipV\Out.tZip", strProcessed + @"\" + System.IO.Path.GetFileName(s)); // Try to move
+                                    File.Delete(s);
+                                }
+                                else
+                                {
+                                    logString(myFixing.strError);
+                                }
+                                myFixing.Dispose();
+                                // Set cursor as default arrow
+                                Cursor.Current = Cursors.Default;
+                                logString(s);
                             
                             }
                             #endregion
@@ -215,8 +235,33 @@ namespace TZipValidator
                             string err = "Error Processing found TZip Files: ";
                             err += excep.Message;
                             logString(err);
+                            if(strMode == "Fix All")
+                            {
+                                try
+                                {
+                                    File.Move(s, strRejected + @"\" + System.IO.Path.GetFileName(s)); // Try to move
+                                    logString("Regected: " + s + " because of Error logged above.");
+                                }
+                                catch (IOException ex)
+                                {
+                                    logString("Error moving file with Error: " + ex); // Write error
+                                }
+                            }
+                        }
+                    } // end if file had .TZip Extension
+                    else if (strMode == "Fix All")
+                    {
+                        try
+                        {
+                            File.Move(s, strRejected + @"\"+ System.IO.Path.GetFileName(s) ); // Try to move
+                            logString("Regected: " + s + " because it didn't have .tzip extenstion.");
+                        }
+                        catch (IOException ex)
+                        {
+                            logString("Error moving file without tzip extension: "+ex); // Write error
                         }
                     }
+
                    
                     lblStatus.Text = "Looping through found Files";
                 }
@@ -227,6 +272,7 @@ namespace TZipValidator
                 logString("Source path does not exist!");
                 lblStatus.Text = "Please Fix Source Dir Settings";
             }
+            lblStatus.Text = "Waiting for user input";
         }
 
         #region logString
@@ -245,42 +291,6 @@ namespace TZipValidator
             }
             richTextBox1.Text += str2log + "\r\n";
             Refresh();
-        }
-        #endregion
-        #region postFixingBad
-        //
-        // Fixing Form had error report and shut down
-        //
-        public void postFixingBad(string strError)
-        {
-            logString(strError);
-            // Set cursor as default arrow
-            Cursor.Current = Cursors.Default;
-            myFixing.Hide();
-            myFixing.Dispose();
-            myFixing = null;
-        }
-        #endregion
-        #region postFixingGood
-        //
-        // Fixing Form came backgood
-        //
-        public void postFixingGood(string strError)
-        {
-            logString(strError);
-            // Set cursor as default arrow
-            Cursor.Current = Cursors.Default;
-            myFixing.Hide();
-            myFixing.Dispose();
-            myFixing = null;
-            // Folder needs compressing at System.IO.Path.GetTempPath() + @"TZipV\Out\"
-            // if can't unzip error is thrown in a string
-            string strErr = UnZipFiles.compressNmove(System.IO.Path.GetTempPath() + @"TZipV\Out\", System.IO.Path.GetTempPath() + @"TZipV\Out.tZip");
-            if (strErr.Length > 0) logString(strErr);
-#if DEBUG
-            else logString(@" I created %Temp%\TZipV\Out.tZip");
-#endif
-            
         }
         #endregion
         #region Saving Settings as FormClosing
