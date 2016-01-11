@@ -203,6 +203,13 @@ namespace TZipValidator
                                 // Show testDialog as a modal dialog and determine if DialogResult = OK.
                                 if (myFixing.ShowDialog(this) == DialogResult.OK)
                                 {
+                                    string strTempMode = Path.GetDirectoryName(s) + @"\Mode.text";
+                                    // if exists copy mode.txt file to the folder
+                                    if (File.Exists(strTempMode))
+                                    {
+                                        File.Copy(strTempMode,
+                                            System.IO.Path.GetTempPath() + @"TZipV\Out\");
+                                    }
                                     // Folder needs compressing at System.IO.Path.GetTempPath() + @"TZipV\Out\"
                                     // if can't unzip error is thrown in a string
                                     string strCompressErr = UnZipFiles.compressNmove(System.IO.Path.GetTempPath() + @"TZipV\Out\", System.IO.Path.GetTempPath() + @"TZipV\Out.tZip");

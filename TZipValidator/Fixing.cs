@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUG
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.ComponentModel;
@@ -244,18 +245,13 @@ namespace TZipValidator
                 try
                 {
                     // Clean up out directory, if exists delete and rebuild
-                    if (Directory.Exists( System.IO.Path.GetTempPath() + @"TZipV\Out\"))
+                    if (Directory.Exists( System.IO.Path.GetTempPath() + @"TZipV\Out"))
                     {
-                        Directory.Delete(System.IO.Path.GetTempPath() + @"TZipV\Out\", true);
+                        Directory.Delete(System.IO.Path.GetTempPath() + @"TZipV\Out", true);
                     }
                     // remake out directory
                     Directory.CreateDirectory(System.IO.Path.GetTempPath() + @"TZipV\Out\");
-                    // if exists copy mode.txt file to the folder
-                    if (File.Exists(Path.GetDirectoryName(strFullFileName) + @"\Mode.text"))
-                    {
-                        File.Copy(Path.GetDirectoryName(strFullFileName) + @"\Mode.text",
-                            System.IO.Path.GetTempPath() + @"TZipV\Out\");
-                    }
+
 
                     for (int i = 0; i < iNumberOfFiles; i++)
                     {
@@ -271,10 +267,10 @@ namespace TZipValidator
                             strMiddleName = Path.GetDirectoryName(strFullFileName) + @"\" +
                                 strShortName.Substring(0, iCharNumStarts) + strTemp + i.ToString() + ".tga";
                         }
-#if NumDebug
+#if DEBUG
                         lblListFiles.Text = "Fixing number: " + i.ToString() + " File Name: " + strMiddleName;
-#endif
                         m_parent.logString(lblListFiles.Text);
+#endif
                         progressBar1.Value = i;
                         Refresh();
                         #region Fixing Uncompressed
@@ -419,11 +415,6 @@ namespace TZipValidator
             #endregion  // fixing mode
 
             // Returning good after copying mode file
-            string strTestMode = Path.GetDirectoryName(strFullFileName) + @"\mode.txt";
-            if (File.Exists(strTestMode))
-            {
-                File.Move(Path.GetDirectoryName(strFullFileName) + "mode.txt", System.IO.Path.GetTempPath() + @"TZipV\Out\");
-            }
             DialogResult = DialogResult.OK;
         }
 
